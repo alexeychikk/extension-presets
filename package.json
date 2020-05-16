@@ -1,0 +1,101 @@
+{
+	"name": "extension-presets",
+	"displayName": "Extension Presets",
+	"description": "Create extension presets and switch between them in different workspaces",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.45.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension-presets.createPreset",
+				"title": "Extension Presets: Create preset"
+			},
+			{
+				"command": "extension-presets.applyPreset",
+				"title": "Extension Presets: Apply preset"
+			},
+			{
+				"command": "extension-presets.changePreset",
+				"title": "Extension Presets: Change preset"
+			},
+			{
+				"command": "extension-presets.deletePreset",
+				"title": "Extension Presets: Delete preset"
+			}
+		],
+		"configuration": {
+			"title": "Extension Presets",
+			"properties": {
+				"presets": {
+					"type": "object",
+					"scope": "application",
+					"default": {},
+					"description": "A map where the key is a preset name and the value is the preset config",
+					"additionalProperties": {
+						"type": "object",
+						"description": "Preset config",
+						"properties": {
+							"id": {
+								"type": "string",
+								"pattern": "\\S+",
+								"description": "A unique ID of the preset"
+							},
+							"name": {
+								"type": "string",
+								"pattern": "\\S+",
+								"description": "Name of the preset"
+							},
+							"extensionIds": {
+								"type": "array",
+								"description": "Array of enabled extension IDs",
+								"items": {
+									"type": "string",
+									"pattern": "\\S+"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run build",
+		"build": "webpack --mode production",
+		"webpack": "webpack --mode development",
+		"webpack-dev": "webpack --mode development --watch",
+		"compile": "tsc -p ./",
+		"lint": "eslint src --ext ts",
+		"pretest": "npm run compile && npm run lint",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^7.0.2",
+		"@types/node": "^13.11.0",
+		"@types/shortid": "0.0.29",
+		"@types/vscode": "^1.45.0",
+		"@typescript-eslint/eslint-plugin": "^2.30.0",
+		"@typescript-eslint/parser": "^2.30.0",
+		"eslint": "^6.8.0",
+		"glob": "^7.1.6",
+		"mocha": "^7.1.2",
+		"ts-loader": "^7.0.4",
+		"typescript": "^3.8.3",
+		"vscode-test": "^1.3.0",
+		"webpack": "^4.43.0",
+		"webpack-cli": "^3.3.11"
+	},
+	"dependencies": {
+		"shortid": "^2.2.15"
+	}
+}
