@@ -27,6 +27,7 @@ export class PresetsManager {
       throw new Error(`Preset with ID '${id}' was not found`);
     }
     await this.extensionsManager.enableOnly(preset.extensionIds);
+    await this.updateCurrentPreset(preset.id);
   }
 
   public async changePreset(options: SerializedPreset) {
@@ -72,6 +73,12 @@ export class PresetsManager {
     await workspace
       .getConfiguration(EXTENSION_NAME)
       .update("presets", presets, true);
+  }
+
+  private async updateCurrentPreset(id?: string) {
+    await workspace
+      .getConfiguration(EXTENSION_NAME)
+      .update("currentPreset", id, true);
   }
 
   private getConfig<Key extends keyof PresetsConfig>(

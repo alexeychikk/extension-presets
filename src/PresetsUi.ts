@@ -72,7 +72,7 @@ export class PresetsUi {
     if (!preset) {
       return;
     }
-    const name = await this.pickPresetName(preset.name);
+    const name = await this.pickPresetName(preset);
     if (!name) {
       return;
     }
@@ -142,12 +142,14 @@ export class PresetsUi {
     return item?.type as CreatePresetType;
   }
 
-  private async pickPresetName(name?: string): Promise<string | undefined> {
+  private async pickPresetName(
+    currentPreset?: ExtensionPreset
+  ): Promise<string | undefined> {
     const existingPresets = Object.values(this.presetsManager.listPresets());
     return window.showInputBox({
       ignoreFocusOut: true,
       prompt: "Name of the preset",
-      value: name,
+      value: currentPreset?.name,
       validateInput: (value) => {
         if (!ExtensionPreset.isNameValid(value)) {
           return "Please enter at least one character or number";
@@ -157,7 +159,7 @@ export class PresetsUi {
         }
         const formattedValue = this.formatPresetName(value);
         const existingPreset = existingPresets.find(
-          (p) => p!.name === formattedValue
+          (p) => p!.id !== currentPreset?.id && p!.name === formattedValue
         );
         if (existingPreset) {
           return "Preset with such name already exists";

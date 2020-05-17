@@ -1,4 +1,5 @@
-import { commands, extensions, Extension } from "vscode";
+import { commands, extensions, Extension, workspace } from "vscode";
+import { EXTENSION_ID } from "./constants";
 
 export interface ExtensionInfo {
   id: string;
@@ -9,7 +10,7 @@ export interface ExtensionInfo {
 export class ExtensionsManager {
   public list(): ExtensionInfo[] {
     return extensions.all
-      .filter((ext) => !ext.packageJSON.isBuiltin)
+      .filter((ext) => !ext.packageJSON.isBuiltin && ext.id !== EXTENSION_ID)
       .map(this.toExtensionInfo)
       .sort((ext1, ext2) => {
         if (ext1.isActive && !ext2.isActive) {
@@ -35,12 +36,19 @@ export class ExtensionsManager {
   }
 
   public async enableOnly(ids: string[]): Promise<void> {
-    // TODO: this doesn't work
-    await commands.executeCommand(
-      "workbench.extensions.disableExtension",
-      this.listActiveIds()
+    const commandsList = (await commands.getCommands()).filter((c) =>
+      c.includes("extension")
     );
-    await this.enable(ids);
+    console.log("COMMANDS", commandsList);
+    await commands.executeCommand(
+      "workbench.extensions.action.disableAllWorkspace"
+    );
+    await this.enableOne(EXTENSION_ID);
+    try {
+      await this.enable(ids);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   public reloadWindow() {
@@ -48,7 +56,12 @@ export class ExtensionsManager {
   }
 
   private enableOne = async (id: string): Promise<void> => {
-    return extensions.getExtension(id)?.activate();
+    // this doesn't work
+    const res = await commands.executeCommand(
+      "workbench.extensions.action.toggleIgnoreExtension",
+      id
+    );
+    console.log(res);
   };
 
   private toExtensionInfo = (ext: Extension<any>): ExtensionInfo => {
